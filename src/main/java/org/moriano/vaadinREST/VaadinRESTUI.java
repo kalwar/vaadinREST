@@ -18,11 +18,13 @@ import java.util.Map;
 @SuppressWarnings("serial")
 public class VaadinRESTUI extends UI {
 
-    private TextField urlField = new TextField("Url");
+    private TextField urlField = new TextField();
     private TextArea responseArea = new TextArea();
-    private ComboBox httpMethods = new ComboBox("Method");
+    private ComboBox httpMethods = new ComboBox();
     private Button button = new Button("Send!");
+    private final VerticalLayout baseLayout = new VerticalLayout();
     private final VerticalLayout layout = new VerticalLayout();
+    private final HorizontalLayout topLayout = new HorizontalLayout();
     private HttpRequester httpRequester = new HttpRequester();
     private Table responseHeadersTable = new Table();
 
@@ -43,13 +45,16 @@ public class VaadinRESTUI extends UI {
      * Set up the layout
      */
     private void configureLayout() {
-        this.layout.setMargin(true);
-        this.setContent(layout);
-        this.layout.addComponent(this.urlField);
-        this.layout.addComponent(this.httpMethods);
-        this.layout.addComponent(this.button);
+        this.baseLayout.setMargin(true);
+        this.setContent(baseLayout);
+        this.baseLayout.addComponent(this.topLayout);
+        this.topLayout.addComponent(this.urlField);
+        this.topLayout.addComponent(this.httpMethods);
+        this.topLayout.addComponent(this.button);
         this.layout.addComponent(responseHeadersTable);
         this.layout.addComponent(this.responseArea);
+        this.baseLayout.addComponent(topLayout);
+        this.baseLayout.addComponent(layout);
     }
 
     /**
@@ -58,10 +63,12 @@ public class VaadinRESTUI extends UI {
     private void configureComponents() {
         this.responseArea.setRows(40);
         this.responseArea.setColumns(130);
+        this.urlField.setColumns(40);
         this.httpMethods.addItem(HttpMethod.GET.getMethod());
         this.httpMethods.addItem(HttpMethod.POST.getMethod());
         this.httpMethods.addItem(HttpMethod.PUT.getMethod());
         this.httpMethods.addItem(HttpMethod.DELETE.getMethod());
+        this.httpMethods.setValue(HttpMethod.GET.getMethod());
         this.responseHeadersTable.addContainerProperty("Name", String.class, null);
         this.responseHeadersTable.addContainerProperty("Value", String.class, null);
 
