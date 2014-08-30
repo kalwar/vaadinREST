@@ -3,6 +3,7 @@ package org.moriano.vaadinREST.model;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpRequestBase;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -16,13 +17,25 @@ import java.util.TreeMap;
 public class FullHttpResponse {
 
     private final HttpResponse response;
+    private final HttpRequestBase request;
 
-    public FullHttpResponse(HttpResponse response) {
+    public FullHttpResponse(HttpResponse response, HttpRequestBase request) {
         this.response = response;
+        this.request = request;
     }
 
-    public Map<String, String> getHeaders() {
+    public Map<String, String> getResponseHeaders() {
         Header[] headers = this.response.getAllHeaders();
+        Map<String, String> result = new TreeMap<>();
+        for(Header header : headers) {
+            result.put(header.getName(), header.getValue());
+
+        }
+        return result;
+    }
+
+    public Map<String, String> getRequestHeaders() {
+        Header[] headers = this.request.getAllHeaders();
         Map<String, String> result = new TreeMap<>();
         for(Header header : headers) {
             result.put(header.getName(), header.getValue());

@@ -27,6 +27,9 @@ public class VaadinRESTUI extends UI {
     private final HorizontalLayout topLayout = new HorizontalLayout();
     private HttpRequester httpRequester = new HttpRequester();
     private Table responseHeadersTable = new Table();
+    private Table requestHeadersTable = new Table();
+
+    private TabSheet tabSheet = new TabSheet();
 
 
     @WebServlet(value = "/*", asyncSupported = true)
@@ -47,14 +50,20 @@ public class VaadinRESTUI extends UI {
     private void configureLayout() {
         this.baseLayout.setMargin(true);
         this.setContent(baseLayout);
+        this.baseLayout.addComponent(topLayout);
+        this.baseLayout.addComponent(layout);
+
         this.baseLayout.addComponent(this.topLayout);
         this.topLayout.addComponent(this.urlField);
         this.topLayout.addComponent(this.httpMethods);
         this.topLayout.addComponent(this.button);
-        this.layout.addComponent(responseHeadersTable);
+
         this.layout.addComponent(this.responseArea);
-        this.baseLayout.addComponent(topLayout);
-        this.baseLayout.addComponent(layout);
+        this.baseLayout.addComponent(this.tabSheet);
+        this.tabSheet.addTab(this.layout, "Response Content");
+        this.tabSheet.addTab(this.responseHeadersTable, "Response Headers");
+        this.tabSheet.addTab(this.requestHeadersTable, "Request Headers");
+
     }
 
     /**
@@ -63,14 +72,21 @@ public class VaadinRESTUI extends UI {
     private void configureComponents() {
         this.responseArea.setRows(40);
         this.responseArea.setColumns(130);
+
         this.urlField.setColumns(40);
+
         this.httpMethods.addItem(HttpMethod.GET.getMethod());
         this.httpMethods.addItem(HttpMethod.POST.getMethod());
         this.httpMethods.addItem(HttpMethod.PUT.getMethod());
         this.httpMethods.addItem(HttpMethod.DELETE.getMethod());
         this.httpMethods.setValue(HttpMethod.GET.getMethod());
+
         this.responseHeadersTable.addContainerProperty("Name", String.class, null);
         this.responseHeadersTable.addContainerProperty("Value", String.class, null);
+
+        this.requestHeadersTable.addContainerProperty("Name", String.class, null);
+        this.requestHeadersTable.addContainerProperty("Value", String.class, null);
+
 
         this.urlField.setValue("http://www.google.com");
     }
@@ -88,11 +104,14 @@ public class VaadinRESTUI extends UI {
 
                 StringBuilder buffer = new StringBuilder(responseArea.getValue());
                 buffer.append("RESPONSE CODE IS ").append(response.getResponseCode()).append("\n========================================\n");
-                Map<String, String> headers = response.getHeaders();
                 responseHeadersTable.removeAllItems();
-                for(Map.Entry<String, String> entry : headers.entrySet()) {
+                for(Map.Entry<String, String> entry : response.getResponseHeaders().entrySet()) {
                     responseHeadersTable.addItem(new Object[]{entry.getKey(), entry.getValue()}, entry.getKey());
+                }
 
+                requestHeadersTable.removeAllItems();
+                for(Map.Entry<String, String> entry : response.getRequestHeaders().entrySet()) {
+                    requestHeadersTable.addItem(new Object[]{entry.getKey(), entry.getValue()}, entry.getKey());
                 }
 
                 buffer.append("\n========================================\nRESPONSE\n").append(response.getResponse());

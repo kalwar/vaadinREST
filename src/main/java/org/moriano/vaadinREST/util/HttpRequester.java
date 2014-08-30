@@ -29,7 +29,7 @@ public class HttpRequester {
             try {
                 get = new HttpGet(url);
                 response = this.httpClient.execute(get);
-                result = new FullHttpResponse(response);
+                result = new FullHttpResponse(response, get);
             } catch (IOException e) {
                 e.printStackTrace();
 
