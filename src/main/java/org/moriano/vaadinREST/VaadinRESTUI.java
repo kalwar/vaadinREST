@@ -8,6 +8,11 @@ import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
 import com.vaadin.ui.*;
 import com.vaadin.ui.Button.ClickEvent;
+import org.moriano.vaadinREST.model.FullHttpResponse;
+import org.moriano.vaadinREST.util.HttpMethod;
+import org.moriano.vaadinREST.util.HttpRequester;
+
+import java.util.Map;
 
 @Theme("mytheme")
 @SuppressWarnings("serial")
@@ -19,6 +24,7 @@ public class VaadinRESTUI extends UI {
     private Button button = new Button("Send!");
     private final VerticalLayout layout = new VerticalLayout();
     private HttpRequester httpRequester = new HttpRequester();
+    private Table responseHeadersTable = new Table();
 
 
     @WebServlet(value = "/*", asyncSupported = true)
@@ -42,6 +48,7 @@ public class VaadinRESTUI extends UI {
         this.layout.addComponent(this.urlField);
         this.layout.addComponent(this.httpMethods);
         this.layout.addComponent(this.button);
+        this.layout.addComponent(responseHeadersTable);
         this.layout.addComponent(this.responseArea);
     }
 
@@ -51,11 +58,12 @@ public class VaadinRESTUI extends UI {
     private void configureComponents() {
         this.responseArea.setRows(40);
         this.responseArea.setColumns(130);
-        this.httpMethods.removeAllItems();
         this.httpMethods.addItem(HttpMethod.GET.getMethod());
         this.httpMethods.addItem(HttpMethod.POST.getMethod());
         this.httpMethods.addItem(HttpMethod.PUT.getMethod());
         this.httpMethods.addItem(HttpMethod.DELETE.getMethod());
+        this.responseHeadersTable.addContainerProperty("Name", String.class, null);
+        this.responseHeadersTable.addContainerProperty("Value", String.class, null);
 
         this.urlField.setValue("http://www.google.com");
     }
@@ -68,8 +76,23 @@ public class VaadinRESTUI extends UI {
             public void buttonClick(ClickEvent event) {
                 responseArea.setValue("");
                 responseArea.setValue("Sending to " + urlField.getValue() + "\n Using " + httpMethods.getValue() + "\n========================================\n");
-                String response = httpRequester.call(urlField.getValue(), httpMethods.getValue().toString(), null);
-                responseArea.setValue(responseArea.getValue() + "\n" + response);
+                FullHttpResponse response = httpRequester.call(urlField.getValue(), httpMethods.getValue().toString(), null);
+
+
+                StringBuilder buffer = new StringBuilder(responseArea.getValue());
+                buffer.append("RESPONSE CODE IS ").append(response.getResponseCode()).append("\n========================================\n");
+                Map<String, String> headers = response.getHeaders();
+                responseHeadersTable.removeAllItems();
+                for(Map.Entry<String, String> entry : headers.entrySet()) {
+                    responseHeadersTable.addItem(new Object[]{entry.getKey(), entry.getValue()}, entry.getKey());
+
+                }
+
+                buffer.append("\n========================================\nRESPONSE\n").append(response.getResponse());
+
+
+
+                responseArea.setValue(buffer.toString());
             }
         });
     }

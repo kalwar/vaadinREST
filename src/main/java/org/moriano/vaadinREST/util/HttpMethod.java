@@ -1,4 +1,4 @@
-package org.moriano.vaadinREST;
+package org.moriano.vaadinREST.util;
 
 /**
  * Simple enum to hold the HTTP methods
