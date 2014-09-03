@@ -4,6 +4,7 @@ import org.apache.http.HttpResponse;
 
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.HttpClients;
 import org.moriano.vaadinREST.model.FullHttpResponse;
 import org.moriano.vaadinREST.util.HttpMethod;
@@ -28,12 +29,20 @@ public class HttpRequester {
 
             try {
                 get = new HttpGet(url);
+                for(Map.Entry<String, String> entry : parameters.entrySet()) {
+                    get.addHeader(entry.getKey(), entry.getValue());
+                }
+
                 response = this.httpClient.execute(get);
                 result = new FullHttpResponse(response, get);
             } catch (IOException e) {
                 e.printStackTrace();
 
             }
+        } else if(method.equals(HttpMethod.POST.getMethod())) {
+            HttpPost post;
+
+            post = new HttpPost(url);
         }
 
         return result;
