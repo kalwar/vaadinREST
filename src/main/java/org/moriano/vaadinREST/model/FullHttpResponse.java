@@ -4,6 +4,7 @@ import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.client.methods.HttpUriRequest;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -17,9 +18,9 @@ import java.util.TreeMap;
 public class FullHttpResponse {
 
     private final HttpResponse response;
-    private final HttpRequestBase request;
+    private final HttpUriRequest request;
 
-    public FullHttpResponse(HttpResponse response, HttpRequestBase request) {
+    public FullHttpResponse(HttpResponse response, HttpUriRequest request) {
         this.response = response;
         this.request = request;
     }
